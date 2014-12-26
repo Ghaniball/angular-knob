@@ -20,8 +20,6 @@ angular.module('wnf.directives', []).directive('jqKnob', ['$timeout', '$q', func
       knobInit.release = release;
 
       //console.log(knobInit);
-      console.log($element.children());
-      console.log($element.children().eq(0));
 
       function release(newValue) {
         if (!holdRelease) {
