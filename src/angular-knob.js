@@ -1,4 +1,4 @@
-angular.module('ui.knob', []).directive('knob', ['$timeout', '$q', function ($timeout, $q) {
+angular.module('wnf.directives', []).directive('jqKnob', ['$timeout', '$q', function ($timeout, $q) {
   'use strict';
 
   return {
@@ -9,34 +9,31 @@ angular.module('ui.knob', []).directive('knob', ['$timeout', '$q', function ($ti
       knobData: '=',
       knobOptions: '&'
     },
-    link: function ($scope, element) {
+    link: function ($scope, $element) {
       var knobInit = $scope.knobOptions() || {},
           watchId,
           oldVal = 0,
-          $input = $(element).children('input'),
+          $input = $element.children().eq(0),
+          animation = typeof knobInit.animation !== 'boolean' ? true : knobInit.animation,
           holdRelease = false;
-
 
       knobInit.release = release;
 
-      function release(newValue) {
-        //var deferred = $q.defer();
+      //console.log(knobInit);
+      console.log($element.children());
+      console.log($element.children().eq(0));
 
-        if (holdRelease) {
-          //deferred.resolve();
-        } else {
+      function release(newValue) {
+        if (!holdRelease) {
           $timeout(function () {
             oldVal = newValue;
             $scope.knobData = newValue;
             $scope.$apply();
-            //deferred.resolve();
           });
         }
-
-        //return deferred.promise;
       }
 
-      console.log('start');
+      //console.log('start');
       function bindWatch() {
         //console.log('bindWatch');
         watchId = $scope.$watch('knobData', watchKnobData);
@@ -52,24 +49,31 @@ angular.module('ui.knob', []).directive('knob', ['$timeout', '$q', function ($ti
       }
 
       function animate(val) {
-        console.log('animate', val, oldVal);
-        //$(element).val(newValue).change();
-        holdRelease = true;
         var deferred = $q.defer();
 
-        $({value: oldVal}).animate({value: val}, {
-          duration: 800,
-          easing: 'linear',
-          progress: function () {
-            $input.val(Math.round(this.value)).trigger('change');
-          },
-          complete: function () {
-            //console.log('complete');
-            holdRelease = false;
-            oldVal = val;
-            deferred.resolve();
-          }
-        });
+        console.log('animate', val, oldVal);
+        console.log(animation);
+
+        if (animation) {
+          holdRelease = true;
+
+          $({value: oldVal}).animate({value: val}, {
+            duration: 800,
+            easing: 'linear',
+            progress: function () {
+              $input.val(Math.round(this.value)).trigger('change');
+            },
+            complete: function () {
+              //console.log('complete');
+              holdRelease = false;
+              oldVal = val;
+              deferred.resolve();
+            }
+          });
+        } else {
+          $input.val(val).trigger('change');
+          deferred.resolve();
+        }
 
         return deferred.promise;
       }
