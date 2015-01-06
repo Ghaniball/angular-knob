@@ -19,7 +19,7 @@ angular.module('wnf.directives', []).directive('jqKnob', ['$timeout', '$q', func
 
       knobInit.release = release;
 
-      //console.log(knobInit);
+//      console.log(knobInit);
 
       function release(newValue) {
         if (!holdRelease) {
@@ -49,8 +49,8 @@ angular.module('wnf.directives', []).directive('jqKnob', ['$timeout', '$q', func
       function animate(val) {
         var deferred = $q.defer();
 
-        console.log('animate', val, oldVal);
-        console.log(animation);
+        //console.log('animate', val, oldVal);
+        //console.log(animation);
 
         if (animation) {
           holdRelease = true;
@@ -77,12 +77,18 @@ angular.module('wnf.directives', []).directive('jqKnob', ['$timeout', '$q', func
       }
 
       function processOptions() {
-        if (knobInit.after) {
-          $input.after(knobInit.after);
+        if (knobInit.afterOuter !== false) {
+          $input.after(knobInit.afterOuter);
+        }
+				
+        if (knobInit.afterInner !== false) {
+          $input.addClass('jq-knob-has-after').after(knobInit.afterInner);
         }
       }
 
       function init() {
+				$element.css('color', knobInit.fgColor);
+				
         processOptions();
 
         $input.val(0).knob(knobInit);
